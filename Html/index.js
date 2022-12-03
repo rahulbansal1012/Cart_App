@@ -1,41 +1,11 @@
 let shop =  document.getElementById("shop");
 
-let shopItemData = [
-    {
-    id: "CasualShirt",
-    name:"CasualShirt",
-    price : 45,
-    desc : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, eligendi?",
-    img :"Images/img-1.jpg"
-},
-    {
-        id: "Tshirt",
-        name:"TShirt",
-        price : 25,
-        desc : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, eligendi?",
-        img :"Images/img-2.jpg"
-    },
 
-    {
-        id: "Suit",
-        name:"Suit",
-        price : 145,
-        desc : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, eligendi?",
-        img :"Images/img-3.jpg"
-    }
-,
-    {
-        id: "Lsat",
-        name:"Last",
-        price : 300,
-        desc : "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nemo, eligendi?",
-        img :"Images/img-4.jpg"
-    }
-]
-
-let basket = [];
+let total_item =JSON.parse(localStorage.getItem("CartItem"))||0;
+let basket = JSON.parse(localStorage.getItem("Data")) || [];
 let generateShop = () =>{
     return (shop.innerHTML =  shopItemData.map((x)=> {
+        let search= basket.find((c)=>c.id===x.id) || [];
         return `<div class="item">
         <img src= "${x.img}" width="220">
         <div class="details">
@@ -45,7 +15,7 @@ let generateShop = () =>{
                     <h2>$ ${x.price}</h2>
                     <div class="buttons">
                         <i onclick= "inc(${x.id})" class="bi bi-plus"></i>
-                        <div id = ${x.id} class="quantity">0</div>
+                        <div id = ${x.id} class="quantity">${search.item===undefined?0:search.item}</div>
                         <i onclick = "dec(${x.id})" class="bi bi-dash"></i>
 
                     </div>
@@ -54,18 +24,17 @@ let generateShop = () =>{
      </div>`;
     }).join(""));
 }
+
 generateShop();
 
 let inc = (id)=>{
     let selectedItem  =  id;
-//    basket =  search(selectedItem,basket);
-    // basket.push({id:selectedItem.id,item:1})
-
-
+    
     let search = basket.find((x)=>
         x.id===selectedItem.id
     );
-    if(search===undefined){
+   
+   if(search===undefined){
         basket.push({id:selectedItem.id,
         item:1})
     }
@@ -73,64 +42,55 @@ let inc = (id)=>{
         search.item+=1;
     }
 console.log(basket);
-
+console.log("calling update");
 update(selectedItem.id);}
 
 let dec =(id)=>{
     let selectedItem  =  id;
-    //    basket =  search(selectedItem,basket);
-        // basket.push({id:selectedItem.id,item:1})
+    
     
     
         let search = basket.find((x)=>
             x.id===selectedItem.id
         );
-        if(search.item===0){
+        if(search==undefined) return ;
+       else if(search.item===0){
             return;
         }
         else{
-            if(search.item<=1){search.item=0;}
+            if(search.item<1){search.item=0;}
             else search.item-=1;
         }
         console.log(basket);
+        console.log("calling update");
 update(selectedItem.id);
 }
 
 let update = (id)=>{
+    // basket = basket.filter((x)=>x.item !=0);
    let search =  basket.find((x)=>x.id===id);
    document.getElementById(id).innerHTML = search.item;
+   console.log("calling calculation");
    calculation(basket);
+   localStorage.setItem("Data", JSON.stringify(basket));
+   localStorage.setItem("CartItem",JSON.stringify(total_item ));
 };
 
 
 let calculation = (basket)=>{
+let     total_item=0
 let cartIcon = document.getElementById("cartAmount");
-let total_item =0;
+
 total =  basket.find((x)=>{
     // console.log(x.item);
    total_item+= x.item;
 }
 );
-console.log(total_item);
+
 cartIcon.innerHTML= total_item;
 
 }
-/*
+calculation(basket);
 
-let search= (selectedItem,basket) =>{
-    let find =  basket.find((x)=> x.id === selectedItem.id);
-    if(find===undefined){
-        basket.push({
-            id:selectedItem.id,
-            item:1,
-        });
-    }
-    else{
-        find.item+=1;
-    }
-    console.log(basket);
 
-    return basket;
-}
 
-*/
